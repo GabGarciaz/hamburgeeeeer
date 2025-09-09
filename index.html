@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burger House - Hambúrgueres Artesanais</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <h2>🍔 Burger House</h2>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="#" onclick="showPage('home')" class="nav-link">Home</a></li>
+                <li><a href="#" onclick="showPage('menu')" class="nav-link">Cardápio</a></li>
+                <li><a href="#" onclick="showPage('login')" class="nav-link" id="login-link">Login</a></li>
+                <li><a href="#" onclick="showPage('register')" class="nav-link" id="register-link">Cadastro</a></li>
+                <li><a href="#" onclick="showPage('cart')" class="nav-link cart-link">Carrinho <span id="cart-count">0</span></a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Home Page -->
+    <div id="home-page" class="page active">
+        <!-- Hero Banner -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Hambúrgueres Artesanais</h1>
+                <p>Os melhores ingredientes, o sabor mais incrível da cidade</p>
+                <button class="cta-button" onclick="showPage('menu')">Ver Cardápio</button>
+            </div>
+            <div class="hero-image">
+                <img src="https://images.pexels.com/photos/1639557/pexels-photo-1639557.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Hambúrguer Artesanal">
+            </div>
+        </section>
+
+        <!-- Featured Products -->
+        <section class="featured">
+            <div class="container">
+                <h2>Produtos em Destaque</h2>
+                <div class="products-grid" id="featured-products">
+                    <!-- Products will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Menu Page -->
+    <div id="menu-page" class="page">
+        <section class="menu-section">
+            <div class="container">
+                <h2>Nosso Cardápio</h2>
+                <div class="menu-categories">
+                    <button class="category-btn active" onclick="filterCategory('all')">Todos</button>
+                    <button class="category-btn" onclick="filterCategory('burgers')">Hambúrgueres</button>
+                    <button class="category-btn" onclick="filterCategory('combos')">Combos</button>
+                    <button class="category-btn" onclick="filterCategory('drinks')">Bebidas</button>
+                </div>
+                <div class="products-grid" id="menu-products">
+                    <!-- Products will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login-page" class="page">
+        <section class="auth-section">
+            <div class="auth-container">
+                <h2>Entrar</h2>
+                <form class="auth-form" id="login-form">
+                    <div class="input-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Senha</label>
+                        <input type="password" id="login-password" name="password" required>
+                    </div>
+                    <button type="submit" class="auth-button">Entrar</button>
+                    <p class="auth-link">Não tem uma conta? <a href="#" onclick="showPage('register')">Criar conta</a></p>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Register Page -->
+    <div id="register-page" class="page">
+        <section class="auth-section">
+            <div class="auth-container">
+                <h2>Criar Conta</h2>
+                <form class="auth-form" id="register-form">
+                    <div class="input-group">
+                        <label for="register-name">Nome</label>
+                        <input type="text" id="register-name" name="name" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" name="email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="register-password">Senha</label>
+                        <input type="password" id="register-password" name="password" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="register-confirm">Confirmar Senha</label>
+                        <input type="password" id="register-confirm" name="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="auth-button">Cadastrar</button>
+                    <p class="auth-link">Já tem uma conta? <a href="#" onclick="showPage('login')">Entrar</a></p>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Cart Page -->
+    <div id="cart-page" class="page">
+        <section class="cart-section">
+            <div class="container">
+                <h2>Seu Carrinho</h2>
+                <div id="cart-content">
+                    <div id="cart-items"></div>
+                    <div id="cart-empty" class="cart-empty">
+                        <p>Seu carrinho está vazio</p>
+                        <button class="cta-button" onclick="showPage('menu')">Ver Cardápio</button>
+                    </div>
+                </div>
+                <div id="cart-summary" class="cart-summary">
+                    <div class="summary-item">
+                        <span>Total: </span>
+                        <span id="cart-total">R$ 0,00</span>
+                    </div>
+                    <button class="checkout-button" onclick="checkout()">Finalizar Pedido</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Order Summary Page -->
+    <div id="order-page" class="page">
+        <section class="order-section">
+            <div class="container">
+                <h2>Resumo do Pedido</h2>
+                <div id="order-summary">
+                    <!-- Order details will be loaded here -->
+                </div>
+                <div class="order-actions">
+                    <button class="back-button" onclick="showPage('cart')">Voltar ao Carrinho</button>
+                    <button class="confirm-button" onclick="confirmOrder()">Confirmar Pedido</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Success Message -->
+    <div id="success-message" class="success-message">
+        <div class="success-content">
+            <h3>✅ Sucesso!</h3>
+            <p id="success-text"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
