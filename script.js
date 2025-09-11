@@ -508,7 +508,15 @@ function showNotification(message, type = 'success') {
             successMessage.classList.remove('show');
         }, 3000);
     }
-}
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()">&times;</button>
+    `;
+    
+    document.body.appendChild(notification);
     
     setTimeout(() => {
         notification.classList.add('show');
