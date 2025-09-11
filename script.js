@@ -136,20 +136,22 @@ function setupScrollEffects() {
 }
 
 function showPage(page) {
+    console.log('Showing page:', page);
+    
     // Esconder todas as páginas
     const pages = document.querySelectorAll('.page');
     pages.forEach(p => {
         p.classList.remove('active');
-        p.style.display = 'none';
     });
     
     // Mostrar página selecionada
-    const targetPage = document.getElementById(page);
+    const targetPage = document.getElementById(page + '-page') || document.getElementById(page);
     if (targetPage) {
-        targetPage.style.display = 'block';
         setTimeout(() => {
             targetPage.classList.add('active');
         }, 10);
+    } else {
+        console.error('Page not found:', page);
     }
     
     // Atualizar navegação ativa
@@ -164,57 +166,38 @@ function showPage(page) {
     currentPage = page;
     
     // Carregar conteúdo específico da página
-    if (page === 'home') {
+    if (page === 'home' || page === 'home-page') {
         loadFeaturedProducts();
-    } else if (page === 'menu') {
+    } else if (page === 'menu' || page === 'menu-page') {
         loadMenu();
-    } else if (page === 'cart') {
+    } else if (page === 'cart' || page === 'cart-page') {
         loadCart();
-    } else if (page === 'orders') {
+    } else if (page === 'order' || page === 'order-page') {
         loadOrders();
     }
 }
 
 function loadFeaturedProducts() {
-    const container = document.querySelector('.featured-products');
+    const container = document.getElementById('featured-products');
     if (!container) return;
     
     const featuredProducts = products.slice(0, 3);
-    container.innerHTML = featuredProducts.map((product, index) => `
-        <div class="product-card" style="animation-delay: ${index * 0.1}s">
-            <div class="product-image">
-                <img src="${product.image}" alt="${product.name}" loading="lazy">
-                <div class="product-overlay">
-                    <button class="btn btn-primary" onclick="addToCart(${product.id})">
-                        <i class="fas fa-shopping-cart"></i>
-                        Adicionar
-                    </button>
-                </div>
-            </div>
+    container.innerHTML = featuredProducts.map(product => `
+        <div class="product-card">
+            <img src="${product.image}" alt="${product.name}" class="product-image">
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
                 <div class="product-price">R$ ${product.price.toFixed(2)}</div>
+                <button class="add-to-cart" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
             </div>
         </div>
     `).join('');
 }
 
 function loadMenu() {
-    const container = document.querySelector('.menu-products');
+    const container = document.getElementById('menu-products');
     if (!container) return;
-    
-    const categories = ['todos', 'hamburgueres', 'combos', 'bebidas'];
-    const filterButtons = document.querySelector('.menu-filters');
-    
-    if (filterButtons) {
-        filterButtons.innerHTML = categories.map(cat => `
-            <button class="filter-btn ${cat === 'todos' ? 'active' : ''}" 
-                    onclick="filterProducts('${cat}')">
-                ${cat.charAt(0).toUpperCase() + cat.slice(1)}
-            </button>
-        `).join('');
-    }
     
     displayProducts(products);
 }
@@ -222,9 +205,16 @@ function loadMenu() {
 function filterProducts(category) {
     const buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
     
-    const filteredProducts = category === 'todos' 
+    // Encontrar o botão clicado e adicionar classe active
+    const clickedButton = Array.from(buttons).find(btn => 
+        btn.textContent.toLowerCase().includes(category === 'all' ? 'todos' : category)
+    );
+    if (clickedButton) {
+        clickedButton.classList.add('active');
+    }
+    
+    const filteredProducts = category === 'all' 
         ? products 
         : products.filter(p => p.category === category);
     
@@ -232,24 +222,17 @@ function filterProducts(category) {
 }
 
 function displayProducts(productsToShow) {
-    const container = document.querySelector('.menu-products');
+    const container = document.getElementById('menu-products');
     if (!container) return;
     
-    container.innerHTML = productsToShow.map((product, index) => `
-        <div class="product-card" style="animation-delay: ${index * 0.1}s">
-            <div class="product-image">
-                <img src="${product.image}" alt="${product.name}" loading="lazy">
-                <div class="product-overlay">
-                    <button class="btn btn-primary" onclick="addToCart(${product.id})">
-                        <i class="fas fa-shopping-cart"></i>
-                        Adicionar
-                    </button>
-                </div>
-            </div>
+    container.innerHTML = productsToShow.map(product => `
+        <div class="product-card">
+            <img src="${product.image}" alt="${product.name}" class="product-image">
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>${product.description}</p>
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
                 <div class="product-price">R$ ${product.price.toFixed(2)}</div>
+                <button class="add-to-cart" onclick="addToCart(${product.id})">Adicionar ao Carrinho</button>
             </div>
         </div>
     `).join('');
@@ -276,12 +259,12 @@ function addToCart(productId) {
 }
 
 function updateCartCounter() {
-    const counter = document.querySelector('.cart-counter');
+    const counter = document.getElementById('cart-count');
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     
     if (counter) {
         counter.textContent = totalItems;
-        counter.style.display = totalItems > 0 ? 'block' : 'none';
+        counter.style.display = totalItems > 0 ? 'inline' : 'inline';
         
         if (totalItems > 0) {
             counter.classList.add('pulse');
@@ -291,44 +274,38 @@ function updateCartCounter() {
 }
 
 function loadCart() {
-    const container = document.querySelector('.cart-items');
-    const totalElement = document.querySelector('.cart-total');
+    const container = document.getElementById('cart-items');
+    const totalElement = document.getElementById('cart-total');
     
     if (!container) return;
     
     if (cart.length === 0) {
         container.innerHTML = `
-            <div class="empty-cart">
-                <i class="fas fa-shopping-cart"></i>
-                <h3>Seu carrinho está vazio</h3>
-                <p>Adicione alguns produtos deliciosos!</p>
-                <button class="btn btn-primary" onclick="showPage('menu')">
-                    Ver Cardápio
-                </button>
-            </div>
+            <p>Seu carrinho está vazio</p>
+            <button class="cta-button" onclick="showPage('menu')">Ver Cardápio</button>
         `;
+        document.getElementById('cart-empty').style.display = 'block';
+        document.getElementById('cart-summary').style.display = 'none';
         if (totalElement) totalElement.textContent = 'R$ 0,00';
         return;
+    } else {
+        document.getElementById('cart-empty').style.display = 'none';
+        document.getElementById('cart-summary').style.display = 'block';
     }
     
     container.innerHTML = cart.map(item => `
         <div class="cart-item">
-            <img src="${item.image}" alt="${item.name}">
-            <div class="item-info">
-                <h4>${item.name}</h4>
-                <p>R$ ${item.price.toFixed(2)}</p>
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+            <div class="cart-item-info">
+                <h4 class="cart-item-name">${item.name}</h4>
+                <div class="cart-item-price">R$ ${item.price.toFixed(2)}</div>
             </div>
             <div class="quantity-controls">
-                <button onclick="updateQuantity(${item.id}, -1)">-</button>
-                <span>${item.quantity}</span>
-                <button onclick="updateQuantity(${item.id}, 1)">+</button>
+                <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                <span class="quantity">${item.quantity}</span>
+                <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
             </div>
-            <div class="item-total">
-                R$ ${(item.price * item.quantity).toFixed(2)}
-            </div>
-            <button class="remove-item" onclick="removeFromCart(${item.id})">
-                <i class="fas fa-trash"></i>
-            </button>
+            <button class="remove-btn" onclick="removeFromCart(${item.id})">Remover</button>
         </div>
     `).join('');
     
@@ -373,30 +350,32 @@ function checkout() {
         return;
     }
     
-    showPage('orders');
+    showPage('order');
 }
 
 function loadOrders() {
-    const container = document.querySelector('.order-summary');
+    const container = document.getElementById('order-summary');
     if (!container || cart.length === 0) return;
     
     const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     
     container.innerHTML = `
-        <div class="order-items">
+        <div class="cart-summary">
             ${cart.map(item => `
-                <div class="order-item">
-                    <span>${item.name} x${item.quantity}</span>
-                    <span>R$ ${(item.price * item.quantity).toFixed(2)}</span>
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                    <div class="cart-item-info">
+                        <h4 class="cart-item-name">${item.name}</h4>
+                        <div class="cart-item-price">Quantidade: ${item.quantity}</div>
+                        <div class="cart-item-price">R$ ${(item.price * item.quantity).toFixed(2)}</div>
+                    </div>
                 </div>
             `).join('')}
+            <div class="summary-item">
+                <span>Total: </span>
+                <span>R$ ${total.toFixed(2)}</span>
+            </div>
         </div>
-        <div class="order-total">
-            <strong>Total: R$ ${total.toFixed(2)}</strong>
-        </div>
-        <button class="btn btn-primary btn-large" onclick="confirmOrder()">
-            Confirmar Pedido
-        </button>
     `;
 }
 
@@ -420,65 +399,75 @@ function confirmOrder() {
     showPage('home');
 }
 
-// Funções de autenticação
-function login(event) {
-    event.preventDefault();
-    
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    
-    if (!email || !password) {
-        showNotification('Preencha todos os campos!', 'error');
-        return;
+// Event listeners para formulários
+document.addEventListener('DOMContentLoaded', function() {
+    // Login form
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showNotification('Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            // Simulação de login
+            const userData = {
+                email: email,
+                name: email.split('@')[0],
+                id: Date.now()
+            };
+            
+            user = userData;
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            showNotification('Login realizado com sucesso!', 'success');
+            updateAuthUI();
+            showPage('home');
+        });
     }
     
-    // Simulação de login - integrar com backend futuramente
-    const userData = {
-        email: email,
-        name: email.split('@')[0],
-        id: Date.now()
-    };
-    
-    user = userData;
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    showNotification('Login realizado com sucesso!', 'success');
-    updateAuthUI();
-    showPage('home');
-}
-
-function register(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('reg-name').value;
-    const email = document.getElementById('reg-email').value;
-    const password = document.getElementById('reg-password').value;
-    const confirmPassword = document.getElementById('reg-confirm-password').value;
-    
-    if (!name || !email || !password || !confirmPassword) {
-        showNotification('Preencha todos os campos!', 'error');
-        return;
+    // Register form
+    const registerForm = document.getElementById('register-form');
+    if (registerForm) {
+        registerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm').value;
+            
+            if (!name || !email || !password || !confirmPassword) {
+                showNotification('Preencha todos os campos!', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('As senhas não coincidem!', 'error');
+                return;
+            }
+            
+            // Simulação de cadastro
+            const userData = {
+                name: name,
+                email: email,
+                id: Date.now()
+            };
+            
+            user = userData;
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            showNotification('Cadastro realizado com sucesso!', 'success');
+            updateAuthUI();
+            showPage('home');
+        });
     }
-    
-    if (password !== confirmPassword) {
-        showNotification('As senhas não coincidem!', 'error');
-        return;
-    }
-    
-    // Simulação de cadastro - integrar com backend futuramente
-    const userData = {
-        name: name,
-        email: email,
-        id: Date.now()
-    };
-    
-    user = userData;
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    showNotification('Cadastro realizado com sucesso!', 'success');
-    updateAuthUI();
-    showPage('home');
-}
+});
 
 function logout() {
     user = null;
@@ -508,14 +497,18 @@ function updateAuthUI() {
 }
 
 function showNotification(message, type = 'success') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-        <span>${message}</span>
-    `;
+    const successMessage = document.getElementById('success-message');
+    const successText = document.getElementById('success-text');
     
-    document.body.appendChild(notification);
+    if (successMessage && successText) {
+        successText.textContent = message;
+        successMessage.classList.add('show');
+        
+        setTimeout(() => {
+            successMessage.classList.remove('show');
+        }, 3000);
+    }
+}
     
     setTimeout(() => {
         notification.classList.add('show');

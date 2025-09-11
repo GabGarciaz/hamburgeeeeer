@@ -15,11 +15,11 @@
                 <h2>🍔 Burger House</h2>
             </div>
             <ul class="nav-menu">
-                <li><a href="#" onclick="showPage('home')" class="nav-link">Home</a></li>
-                <li><a href="#" onclick="showPage('menu')" class="nav-link">Cardápio</a></li>
-                <li><a href="#" onclick="showPage('login')" class="nav-link" id="login-link">Login</a></li>
-                <li><a href="#" onclick="showPage('register')" class="nav-link" id="register-link">Cadastro</a></li>
-                <li><a href="#" onclick="showPage('cart')" class="nav-link cart-link">Carrinho <span id="cart-count">0</span></a></li>
+                <li><a href="#" onclick="showPage('home')" class="nav-link" data-page="home">Home</a></li>
+                <li><a href="#" onclick="showPage('menu')" class="nav-link" data-page="menu">Cardápio</a></li>
+                <li><a href="#" onclick="showPage('login')" class="nav-link" data-page="login" id="login-link">Login</a></li>
+                <li><a href="#" onclick="showPage('register')" class="nav-link" data-page="register" id="register-link">Cadastro</a></li>
+                <li><a href="#" onclick="showPage('cart')" class="nav-link cart-link" data-page="cart">Carrinho <span id="cart-count">0</span></a></li>
             </ul>
             <div class="hamburger">
                 <span></span>
@@ -55,15 +55,15 @@
     </div>
 
     <!-- Menu Page -->
-    <div id="menu-page" class="page">
+    <div id="menu" class="page">
         <section class="menu-section">
             <div class="container">
                 <h2>Nosso Cardápio</h2>
                 <div class="menu-categories">
-                    <button class="category-btn active" onclick="filterCategory('all')">Todos</button>
-                    <button class="category-btn" onclick="filterCategory('burgers')">Hambúrgueres</button>
-                    <button class="category-btn" onclick="filterCategory('combos')">Combos</button>
-                    <button class="category-btn" onclick="filterCategory('drinks')">Bebidas</button>
+                    <button class="category-btn active" onclick="filterProducts('all')">Todos</button>
+                    <button class="category-btn" onclick="filterProducts('hamburgueres')">Hambúrgueres</button>
+                    <button class="category-btn" onclick="filterProducts('combos')">Combos</button>
+                    <button class="category-btn" onclick="filterProducts('bebidas')">Bebidas</button>
                 </div>
                 <div class="products-grid" id="menu-products">
                     <!-- Products will be loaded here by JavaScript -->
@@ -73,7 +73,7 @@
     </div>
 
     <!-- Login Page -->
-    <div id="login-page" class="page">
+    <div id="login" class="page">
         <section class="auth-section">
             <div class="auth-container">
                 <h2>Entrar</h2>
@@ -94,7 +94,7 @@
     </div>
 
     <!-- Register Page -->
-    <div id="register-page" class="page">
+    <div id="register" class="page">
         <section class="auth-section">
             <div class="auth-container">
                 <h2>Criar Conta</h2>
@@ -123,7 +123,7 @@
     </div>
 
     <!-- Cart Page -->
-    <div id="cart-page" class="page">
+    <div id="cart" class="page">
         <section class="cart-section">
             <div class="container">
                 <h2>Seu Carrinho</h2>
@@ -146,7 +146,7 @@
     </div>
 
     <!-- Order Summary Page -->
-    <div id="order-page" class="page">
+    <div id="order" class="page">
         <section class="order-section">
             <div class="container">
                 <h2>Resumo do Pedido</h2>
