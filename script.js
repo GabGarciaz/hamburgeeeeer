@@ -255,7 +255,6 @@ function addToCart(productId) {
     
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCounter();
-    showNotification(`${product.name} adicionado ao carrinho!`);
 }
 
 function updateCartCounter() {
@@ -340,12 +339,12 @@ function removeFromCart(productId) {
 
 function checkout() {
     if (cart.length === 0) {
-        showNotification('Seu carrinho está vazio!', 'error');
+        alert('Seu carrinho está vazio!');
         return;
     }
     
     if (!user) {
-        showNotification('Faça login para finalizar o pedido!', 'warning');
+        alert('Faça login para finalizar o pedido!');
         showPage('login');
         return;
     }
@@ -395,7 +394,7 @@ function confirmOrder() {
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartCounter();
     
-    showNotification('Pedido confirmado com sucesso!', 'success');
+    alert('Pedido confirmado com sucesso!');
     showPage('home');
 }
 
@@ -411,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = document.getElementById('login-password').value;
             
             if (!email || !password) {
-                showNotification('Preencha todos os campos!', 'error');
+                alert('Preencha todos os campos!');
                 return;
             }
             
@@ -425,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
             user = userData;
             localStorage.setItem('user', JSON.stringify(user));
             
-            showNotification('Login realizado com sucesso!', 'success');
+            alert('Login realizado com sucesso!');
             updateAuthUI();
             showPage('home');
         });
@@ -443,12 +442,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const confirmPassword = document.getElementById('register-confirm').value;
             
             if (!name || !email || !password || !confirmPassword) {
-                showNotification('Preencha todos os campos!', 'error');
+                alert('Preencha todos os campos!');
                 return;
             }
             
             if (password !== confirmPassword) {
-                showNotification('As senhas não coincidem!', 'error');
+                alert('As senhas não coincidem!');
                 return;
             }
             
@@ -462,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
             user = userData;
             localStorage.setItem('user', JSON.stringify(user));
             
-            showNotification('Cadastro realizado com sucesso!', 'success');
+            alert('Cadastro realizado com sucesso!');
             updateAuthUI();
             showPage('home');
         });
@@ -473,7 +472,7 @@ function logout() {
     user = null;
     localStorage.removeItem('user');
     updateAuthUI();
-    showNotification('Logout realizado com sucesso!', 'success');
+    alert('Logout realizado com sucesso!');
     showPage('home');
 }
 
@@ -496,39 +495,6 @@ function updateAuthUI() {
     }
 }
 
-function showNotification(message, type = 'success') {
-    const successMessage = document.getElementById('success-message');
-    const successText = document.getElementById('success-text');
-    
-    if (successMessage && successText) {
-        successText.textContent = message;
-        successMessage.classList.add('show');
-        
-        setTimeout(() => {
-            successMessage.classList.remove('show');
-        }, 3000);
-    }
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <span>${message}</span>
-        <button onclick="this.parentElement.remove()">&times;</button>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
 
 // Efeitos visuais adicionais
 function createRippleEffect(event) {
