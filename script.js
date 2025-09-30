@@ -59,6 +59,7 @@ const products = [
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
     updateCartCounter();
+    setupInputMasks();
     
     // Animações de entrada
     setTimeout(() => {
@@ -239,6 +240,13 @@ function displayProducts(productsToShow) {
 }
 
 function addToCart(productId) {
+    // Verificar se o usuário está logado
+    if (!user) {
+        alert('Você precisa estar logado para adicionar produtos ao carrinho!');
+        showPage('login');
+        return;
+    }
+    
     const product = products.find(p => p.id === productId);
     if (!product) return;
     
@@ -350,6 +358,7 @@ function checkout() {
     }
     
     showPage('order');
+    setupDeliveryForm();
 }
 
 function loadOrders() {
@@ -438,11 +447,17 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const name = document.getElementById('register-name').value;
             const email = document.getElementById('register-email').value;
+            const cpf = document.getElementById('register-cpf').value;
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm').value;
             
-            if (!name || !email || !password || !confirmPassword) {
+            if (!name || !email || !cpf || !password || !confirmPassword) {
                 alert('Preencha todos os campos!');
+                return;
+            }
+            
+            if (!isValidCPF(cpf)) {
+                alert('CPF inválido!');
                 return;
             }
             
@@ -455,6 +470,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const userData = {
                 name: name,
                 email: email,
+                cpf: cpf,
                 id: Date.now()
             };
             
@@ -543,3 +559,82 @@ document.addEventListener('DOMContentLoaded', () => {
     const animateElements = document.querySelectorAll('.product-card, .feature-card, .section');
     animateElements.forEach(el => observer.observe(el));
 });
+
+// Máscaras de input
+function setupInputMasks() {
+    // Máscara CPF
+    const cpfInput = document.getElementById('register-cpf');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            e.target.value = value;
+        });
+    }
+}
+
+// Validação CPF
+function isValidCPF(cpf) {
+    cpf = cpf.replace(/[^\d]+/g, '');
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
+    
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        sum += parseInt(cpf.charAt(i)) * (10 - i);
+    }
+    let remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cpf.charAt(9))) return false;
+    
+    sum = 0;
+    for (let i = 0; i < 10; i++) {
+        sum += parseInt(cpf.charAt(i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    return remainder === parseInt(cpf.charAt(10));
+}
+
+// Validação CEP
+function isValidCEP(cep) {
+    const cepRegex = /^\d{5}-?\d{3}$/;
+    return cepRegex.test(cep);
+}
+
+// Configurar formulário de entrega
+function setupDeliveryForm() {
+    const cepInput = document.getElementById('delivery-cep');
+    const addressInput = document.getElementById('delivery-address');
+    
+    if (cepInput) {
+        // Máscara CEP
+        cepInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            value = value.replace(/(\d{5})(\d)/, '$1-$2');
+            e.target.value = value;
+        });
+        
+        // Buscar endereço por CEP
+        cepInput.addEventListener('blur', function(e) {
+            const cep = e.target.value.replace(/\D/g, '');
+            if (cep.length === 8) {
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.erro) {
+                            addressInput.value = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
+                        } else {
+                            alert('CEP não encontrado!');
+                            addressInput.value = '';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro ao buscar CEP:', error);
+                        alert('Erro ao buscar CEP. Preencha o endereço manualmente.');
+                    });
+            }
+        });
+    }
+}
